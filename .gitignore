@@ -1,0 +1,6 @@
+/tiny
+
+*.o
+
+test
+proxy
