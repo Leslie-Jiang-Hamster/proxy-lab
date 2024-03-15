@@ -230,7 +230,9 @@ char *absolute_to_relative(char *absolute_url) {
   
 //   char *absolute_url = get_maybe_url(line);
 //   char *relative_url = absolute_to_relative(absolute_url);
+//   free(absolute_url);
 //   char *new_line = request_line(relative_url);
+//   free(relative_url);
 
 //   return new_line;
 // }
