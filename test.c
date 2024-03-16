@@ -246,6 +246,7 @@ void TEST_map_request_line() {
 
   assert(strcmp(map_request_line("GET http://www.cmu.edu/hub/index.html HTTP/1.1"), "GET /hub/index.html HTTP/1.0") == 0);
   assert(strcmp(map_request_line("GET https://baidu.com HTTP/1.1"), "GET / HTTP/1.0") == 0);
+  assert(strcmp(map_request_line("GET http://www.cmu.edu/hub/index.html HTTP/1.1"), "GET /hub/index.html HTTP/1.0") == 0);
 
   puts("All passed: " SCOPE);
 }
