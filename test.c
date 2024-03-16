@@ -24,6 +24,7 @@ void TEST_is_relative_url() {
   puts("\nTesting: " SCOPE);
 
   assert(is_relative_url("123") == false);
+  assert(is_relative_url("/index.html") == true);
   assert(is_relative_url("/") == true);
   assert(is_relative_url("(/)") == false);
   assert(is_relative_url("/foo") == true);
@@ -33,7 +34,7 @@ void TEST_is_relative_url() {
   assert(is_relative_url("foo/bar") == false);
   assert(is_relative_url("/foo/bar?baz=123#") == true);
   assert(is_relative_url("/foo/bar#") == true);
-  assert(is_relative_url("/foo/bar?baz=123;nox=456#") == true);
+  assert(is_relative_url("/foo/bar?baz=123&nox=456#") == true);
   assert(is_relative_url("/foo/bar?baz=123#nox=456") == false);
   assert(is_relative_url("/foo/bar?baz=123http://foo.bar") == false);
   assert(is_relative_url("") == false);
@@ -49,16 +50,17 @@ void TEST_is_absolute_url() {
   puts("\nTesting: " SCOPE);
 
   assert(is_absolute_url("foobar") == false);
+  assert(is_absolute_url("foo.bar/index.html#") == true);
   assert(is_absolute_url("http://foobar") == false);
   assert(is_absolute_url("foo.bar") == true);
   assert(is_absolute_url("foo.bar/baz") == true);
-  assert(is_absolute_url("foo.bar/?foo=bar;baz=nox#fragment") == true);
+  assert(is_absolute_url("foo.bar/?foo=bar&baz=nox#fragment") == true);
   assert(is_absolute_url("https://foo.bar") == true);
   assert(is_absolute_url("foo.bar.baz") == true);
   assert(is_absolute_url("ftp://foo.bar.baz") == false);
   assert(is_absolute_url("http://foo.bar/") == true);
   assert(is_absolute_url("https://foo.bar?foo=bar#") == true);
-  assert(is_absolute_url("http://foo.bar/?foo=bar;baz=nox") == true);
+  assert(is_absolute_url("http://foo.bar/?foo=bar&baz=nox") == true);
   assert(is_absolute_url("http://../..") == false);
   assert(is_absolute_url("") == false);
   assert(is_absolute_url(NULL) == false);
@@ -141,6 +143,7 @@ void TEST_is_request_line() {
 
   assert(is_request_line("GET foo.bar HTTP/1.0") == true);
   assert(is_request_line("POST example.com HTTP/1.1") == false);
+  assert(is_request_line("GET http://www.cmu.edu/hub/index.html HTTP/1.1") == true);
   assert(is_request_line("GET foo.bar") == false);
   assert(is_request_line("") == false);
   assert(is_request_line(NULL) == false);
@@ -178,20 +181,6 @@ void TEST_Pcre_capture() {
   puts("All passed: " SCOPE);
 }
 
-void TEST_prepend() {
-  #undef SCOPE
-  #define SCOPE "prepend"
-
-  puts("\nTesting: " SCOPE);
-
-  assert(strcmp(prepend("oo", 'f'), "foo") == 0);
-  assert(strcmp(prepend("", 'f'), "f") == 0);
-  assert(strcmp(prepend("foo", '\0'), "") == 0);
-  assert(prepend(NULL, 'f') == NULL);
-
-  puts("All passed: " SCOPE);
-}
-
 void TEST_absolute_to_relative() {
   #undef SCOPE
   #define SCOPE "absolute_to_relative"
@@ -202,13 +191,84 @@ void TEST_absolute_to_relative() {
   assert(strcmp(absolute_to_relative("http://foo.bar/foo"), "/foo") == 0);
   assert(strcmp(absolute_to_relative("https://foo.bar:43/foo/bar/#"), "/foo/bar/#") == 0);
   assert(strcmp(absolute_to_relative("http://foo.bar:8080?foo=bar"), "/?foo=bar") == 0);
-  assert(strcmp(absolute_to_relative("foo.bar/?foo=bar;baz=nox#fragment"), "/?foo=bar;baz=nox#fragment") == 0);
+  assert(strcmp(absolute_to_relative("foo.bar/?foo=bar&baz=nox#fragment"), "/?foo=bar&baz=nox#fragment") == 0);
+  assert(strcmp(absolute_to_relative("foo.bar/index.html#"), "/index.html#") == 0);
+
+  puts("All passed: " SCOPE);
+}
+
+void TEST_MACROS() {
+  #undef SCOPE
+  #define SCOPE "MACROS"
+
+  puts("\nTesting: " SCOPE);
+
+  assert(LINE_SIZE == 115);
+
+  puts("All passed: " SCOPE);
+}
+
+void TEST_make_request_line() {
+  #undef SCOPE
+  #define SCOPE "make_request_line"
+
+  puts("\nTesting: " SCOPE);
+
+  assert(strcmp(make_request_line("/"), "GET / HTTP/1.0") == 0);
+  assert(strcmp(make_request_line("/foo"), "GET /foo HTTP/1.0") == 0);
+  assert(strcmp(make_request_line("/?foo=bar&baz=nox#fragment"), "GET /?foo=bar&baz=nox#fragment HTTP/1.0") == 0);
+  assert(strcmp(make_request_line("/foo?foo=bar&baz=nox"), "GET /foo?foo=bar&baz=nox HTTP/1.0") == 0);
+
+  puts("All passed: " SCOPE);
+}
+
+void TEST_get_hostname() {
+  #undef SCOPE
+  #define SCOPE "get_hostname"
+
+  puts("\nTesting: " SCOPE);
+
+  assert(strcmp(get_hostname("https://foo.bar"), "foo.bar") == 0);
+  assert(strcmp(get_hostname("http://foo.bar/foo"), "foo.bar") == 0);
+  assert(strcmp(get_hostname("https://foo.bar:43/foo/bar/#"), "foo.bar") == 0);
+  assert(strcmp(get_hostname("http://foo.bar:8080?foo=bar"), "foo.bar") == 0);
+  assert(strcmp(get_hostname("foo.bar/?foo=bar&baz=nox#fragment"), "foo.bar") == 0);
+  assert(strcmp(get_hostname("foo.bar"), "foo.bar") == 0);
+
+  puts("All passed: " SCOPE);
+}
+
+void TEST_map_request_line() {
+  #undef SCOPE
+  #define SCOPE "map_request_line"
+
+  puts("\nTesting: " SCOPE);
+
+  assert(strcmp(map_request_line("GET http://www.cmu.edu/hub/index.html HTTP/1.1"), "GET /hub/index.html HTTP/1.0") == 0);
+  assert(strcmp(map_request_line("GET https://baidu.com HTTP/1.1"), "GET / HTTP/1.0") == 0);
+
+  puts("All passed: " SCOPE);
+}
+
+void TEST_concat() {
+  #undef SCOPE
+  #define SCOPE "concat"
+
+  puts("\nTesting: " SCOPE);
+
+  assert(strcmp(concat("foo", "bar"), "foobar") == 0);
+  assert(strcmp(concat("foo", ""), "foo") == 0);
+  assert(strcmp(concat("", "bar"), "bar") == 0);
+  assert(strcmp(concat("", ""), "") == 0);
+  assert(concat(NULL, NULL) == NULL);
 
   puts("All passed: " SCOPE);
 }
 
 int main() {
+  TEST_MACROS();
   TEST_is_method();
+  TEST_concat();
   TEST_is_relative_url();
   TEST_is_absolute_url();
   TEST_is_version();
@@ -219,8 +279,10 @@ int main() {
   TEST_is_request_line();
   TEST_substr();
   TEST_Pcre_capture();
-  TEST_prepend();
   TEST_absolute_to_relative();
+  TEST_make_request_line();
+  TEST_get_hostname();
+  TEST_map_request_line();
 
   return 0;
 }

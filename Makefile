@@ -19,7 +19,7 @@ proxy.o: proxy.c csapp.h
 proxy: proxy.o csapp.o
 	$(CC) $(CFLAGS) proxy.o csapp.o -o proxy $(LDFLAGS)
 
-parse.o: parse.h
+parse.o: parse.c parse.h
 
 test: test.o parse.o
 	$(CC) $(CFLAGS) test.o parse.o -o test -lpcre
