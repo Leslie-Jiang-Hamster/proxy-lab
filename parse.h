@@ -1,18 +1,21 @@
 #include <stdbool.h>
 
-// constants
+// number constants
 #define METHOD_SIZE 5
 #define URL_SIZE 100
 #define VERSION_SIZE 10
 #define PADDING 5
 #define LINE_SIZE (METHOD_SIZE + URL_SIZE + VERSION_SIZE)
+#define HTTP_PORT_DEFAULT 80
 
+// string constants
 #define METHOD_SIZE_S "5"
 #define URL_SIZE_S "100"
 #define VERSION_SIZE_S "10"
+#define UA_DEFAULT "Mozilla/5.0 (X11; Linux x86_64; rv:10.0.3) Gecko/20120305 Firefox/10.0.3"
 
 // regex patterns
-#define ABSOLUTE "(https?://)?\\w+(\\.\\w+)+(:\\d+)?"
+#define ABSOLUTE "(https?://)?\\w+(\\.\\w+)*(:\\d+)?"
 #define RELATIVE "(/\\w+)*/?((?<=/)([\\w\\.]+))?(\\?(\\w+=\\w+\\&)*(\\w+=\\w+))?(#\\w*)?"
 #define RELATIVE_STRICT "(/\\w+)*/((?<=/)([\\w\\.]+))?(\\?(\\w+=\\w+\\&)*(\\w+=\\w+))?(#\\w*)?"
 #define HOSTNAME "\\w+(\\.\\w+)+"
@@ -43,3 +46,4 @@ char *get_header_value(const char *header);
 char *make_header(const char *key, const char *value);
 bool can_proxy_modify_key(const char *key);
 char *map_header(const char *header);
+int get_port(const char *absolute_url);

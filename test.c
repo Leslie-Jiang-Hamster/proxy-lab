@@ -47,9 +47,10 @@ void TEST_is_absolute_url() {
 
   puts("Testing: " SCOPE);
 
-  assert(is_absolute_url("foobar") == false);
-  assert(is_absolute_url("foo.bar/index.html#") == true);
-  assert(is_absolute_url("http://foobar") == false);
+  assert(is_absolute_url("http://localhost:80") == true);
+  assert(is_absolute_url("foobar") == true);
+  assert(is_absolute_url("foo.bar:80/index.html#") == true);
+  assert(is_absolute_url("http://foobar") == true);
   assert(is_absolute_url("foo.bar") == true);
   assert(is_absolute_url("foo.bar/baz") == true);
   assert(is_absolute_url("foo.bar/?foo=bar&baz=nox#fragment") == true);
@@ -184,6 +185,7 @@ void TEST_absolute_to_relative() {
 
   puts("Testing: " SCOPE);
 
+  assert(strcmp(absolute_to_relative("localhost"), "/") == 0);
   assert(strcmp(absolute_to_relative("https://foo.bar"), "/") == 0);
   assert(strcmp(absolute_to_relative("http://foo.bar/foo"), "/foo") == 0);
   assert(strcmp(absolute_to_relative("https://foo.bar:43/foo/bar/#"), "/foo/bar/#") == 0);
@@ -339,7 +341,7 @@ void TEST_can_proxy_modify_key() {
   #define SCOPE "can_proxy_modify_key"
   puts("Testing: " SCOPE);
 
-  assert(can_proxy_modify_key("Host") == true);
+  assert(can_proxy_modify_key("Host") == false);
   assert(can_proxy_modify_key("User-Agent") == true);
   assert(can_proxy_modify_key("Accept") == false);
   assert(can_proxy_modify_key("Accept-Encoding") == false);
@@ -352,7 +354,21 @@ void TEST_map_header() {
   #define SCOPE "map_header"
   puts("Testing: " SCOPE);
 
-  assert(false);
+  assert(strcmp(map_header("Host: localhost:4500"), "Host: localhost:4500") == 0);
+  assert(strcmp(map_header("User-Agent: curl/7.81.0"), "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:10.0.3) Gecko/20120305 Firefox/10.0.3") == 0);
+  assert(strcmp(map_header("Connection: keep-alive"), "Connection: close") == 0);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_get_port() {
+  #define SCOPE "get_port"
+  puts("Testing: " SCOPE);
+
+  assert(get_port("http://localhost:4500#") == 4500);
+  assert(get_port("https://google.com:4500/?foo=bar&baz=nox") == 4500);
+  assert(get_port("http://192.168.0.1") == 80);
 
   puts("All passed: " SCOPE);
   #undef SCOPE
@@ -383,6 +399,7 @@ int main() {
   TEST_make_header();
   TEST_can_proxy_modify_key();
   TEST_map_header();
+  TEST_get_port();
 
   return 0;
 }

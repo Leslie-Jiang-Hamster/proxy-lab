@@ -198,7 +198,6 @@ char *absolute_to_relative(char *absolute_url) {
 
 char *map_request_line(const char *line) {
   assert(is_request_line(line));
-  #define SCOPE "map_request_line: "
   
   char *absolute_url = get_maybe_url(line);
   char *relative_url = absolute_to_relative(absolute_url);
@@ -207,7 +206,6 @@ char *map_request_line(const char *line) {
   free(relative_url);
 
   return new_line;
-  #undef SCOPE
 }
 
 char *make_request_line(const char *relative_url) {
@@ -276,9 +274,6 @@ char *make_header(const char *key, const char *value) {
 bool can_proxy_modify_key(const char *key) {
   assert(Pcre_match("^[A-Z][A-Za-z-]+[a-z]$", key));
 
-  if (strcmp(key, "Host") == 0) {
-    return true;
-  }
   if (strcmp(key, "User-Agent") == 0) {
     return true;
   }
@@ -299,14 +294,9 @@ char *map_header(const char *header) {
     free(key);
     return strdup(header);
   }
-
-  if (strcmp(key, "Host") == 0) {
-    free(key);
-    return make_header("Host", "www.cmu.edu");
-  }
   if (strcmp(key, "User-Agent") == 0) {
     free(key);
-    return make_header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:10.0.3) Gecko/20120305 Firefox/10.0.3");
+    return make_header("User-Agent", UA_DEFAULT);
   }
   if (strcmp(key, "Connection") == 0) {
     free(key);
@@ -320,4 +310,15 @@ char *map_header(const char *header) {
   assert(false);
   free(key);
   return NULL;
+}
+
+int get_port(const char *absolute_url) {
+  assert(is_absolute_url(absolute_url));
+  if (!Pcre_match("(?<=:)\\d+", absolute_url)) {
+    return HTTP_PORT_DEFAULT;
+  }
+  char *port_string = Pcre_capture("(?<=:)\\d+", absolute_url);
+  int port = atoi(port_string);
+  free(port_string);
+  return port;
 }
