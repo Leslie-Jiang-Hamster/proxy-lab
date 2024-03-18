@@ -16,7 +16,6 @@ char *substr(const char *original_string, int l, int r) {
 }
 
 pcre *Pcre_compile(const char *pattern) {
-  #undef SCOPE
   #define SCOPE "Pcre_compile: "
 
   const char *error;
@@ -28,10 +27,10 @@ pcre *Pcre_compile(const char *pattern) {
     puts(error);
   }
   return compile_result;
+  #undef SCOPE
 }
 
 bool Pcre_match(const char *pattern, const char *target) {
-  #undef SCOPE
   #define SCOPE "Pcre_exec: "
   
   const int OVECTOR_SIZE = 30;
@@ -54,12 +53,12 @@ bool Pcre_match(const char *pattern, const char *target) {
   }
   pcre_free(compile_result);
   return true;
+  #undef SCOPE
 }
 
 char *Pcre_capture(const char *pattern, const char *target) {
   assert(Pcre_match(pattern, target));
 
-  #undef SCOPE
   #define SCOPE "Pcre_capture: "
 
   const int OVECTOR_SIZE = 30;
@@ -74,10 +73,17 @@ char *Pcre_capture(const char *pattern, const char *target) {
     puts(SCOPE "substr extraction error");
   }
   return captured_string;
+  #undef SCOPE
 }
 
 bool is_method(const char *method) {
-  return method != NULL && strcmp(method, "GET") == 0;
+  if (method == NULL) {
+    return false;
+  }
+  if (strcmp(method, "GET") == 0) {
+    return true;
+  }
+  return false;
 }
 
 bool is_relative_url(const char *maybe_url) {
@@ -98,8 +104,6 @@ bool is_version(const char *maybe_version) {
   if (maybe_version == NULL) {
     return false;
   }
-  #undef VERSION
-  #define VERSION "HTTP/\\d+\\.\\d+"
   return Pcre_match("^" VERSION "$", maybe_version);
 }
 
@@ -107,8 +111,6 @@ bool is_triple(const char *maybe_triple) {
   if (maybe_triple == NULL) {
     return false;
   }
-  #undef TRIPLE
-  #define TRIPLE "\\S{1," METHOD_SIZE_S "} \\S{1," URL_SIZE_S "} \\S{1," VERSION_SIZE_S "}"
   return Pcre_match("^" TRIPLE "$", maybe_triple);
 }
 
@@ -137,6 +139,8 @@ char *get_maybe_version(const char *triple) {
 }
 
 bool is_request_line(const char *line) {
+  assert(is_line(line));
+
   if (!is_triple(line)) {
     return false;
   }
@@ -193,13 +197,8 @@ char *absolute_to_relative(char *absolute_url) {
 }
 
 char *map_request_line(const char *line) {
-  #undef SCOPE
+  assert(is_request_line(line));
   #define SCOPE "map_request_line: "
-
-  if (!is_request_line(line)) {
-    puts(SCOPE "not a request line");
-    return NULL;
-  }
   
   char *absolute_url = get_maybe_url(line);
   char *relative_url = absolute_to_relative(absolute_url);
@@ -208,6 +207,7 @@ char *map_request_line(const char *line) {
   free(relative_url);
 
   return new_line;
+  #undef SCOPE
 }
 
 char *make_request_line(const char *relative_url) {
@@ -222,9 +222,6 @@ char *make_request_line(const char *relative_url) {
 char *get_hostname(const char *absolute_url) {
   assert(is_absolute_url(absolute_url));
 
-  #undef HOSTNAME
-  #define HOSTNAME "\\w+(\\.\\w+)+"
-
   return Pcre_capture(HOSTNAME, absolute_url);
 }
 
@@ -237,4 +234,90 @@ char *concat(const char *string_1, const char *string_2) {
   char *new_string = calloc(new_string_size, sizeof(char));
   sprintf(new_string, "%s%s", string_1, string_2);
   return new_string;
+}
+
+bool is_line(const char *string) {
+  if (string == NULL) {
+    return false;
+  }
+  return !Pcre_match("\r\n", string);
+}
+
+bool is_header(const char *string) {
+  assert(string != NULL);
+  assert(is_line(string));
+
+  if (Pcre_match("^" HEADER "$", string)) {
+    return true;
+  }
+  return false;
+}
+
+char *get_header_key(const char *header) {
+  assert(is_header(header));
+
+  return Pcre_capture("^[A-Za-z-]+(?=: )", header);
+}
+
+char *get_header_value(const char *header) {
+  assert(is_header(header));
+
+  return Pcre_capture("(?<=: ).*$", header);
+}
+
+char *make_header(const char *key, const char *value) {
+  assert(Pcre_match("^[A-Z][A-Za-z-]+[a-z]$", key));
+
+  char *header = calloc(LINE_SIZE + PADDING, sizeof(char));
+  sprintf(header, "%s: %s", key, value);
+  return header;
+}
+
+bool can_proxy_modify_key(const char *key) {
+  assert(Pcre_match("^[A-Z][A-Za-z-]+[a-z]$", key));
+
+  if (strcmp(key, "Host") == 0) {
+    return true;
+  }
+  if (strcmp(key, "User-Agent") == 0) {
+    return true;
+  }
+  if (strcmp(key, "Connection") == 0) {
+    return true;
+  }
+  if (strcmp(key, "Proxy-Connection") == 0) {
+    return true;
+  }
+  return false;
+}
+
+char *map_header(const char *header) {
+  assert(is_header(header));
+
+  char *key = get_header_key(header);
+  if (!can_proxy_modify_key(key)) {
+    free(key);
+    return strdup(header);
+  }
+
+  if (strcmp(key, "Host") == 0) {
+    free(key);
+    return make_header("Host", "www.cmu.edu");
+  }
+  if (strcmp(key, "User-Agent") == 0) {
+    free(key);
+    return make_header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:10.0.3) Gecko/20120305 Firefox/10.0.3");
+  }
+  if (strcmp(key, "Connection") == 0) {
+    free(key);
+    return make_header("Connection", "close");
+  }
+  if (strcmp(key, "Proxy-Connection") == 0) {
+    free(key);
+    return make_header("Proxy-Connection", "close");
+  }
+  // control never reaches here
+  assert(false);
+  free(key);
+  return NULL;
 }

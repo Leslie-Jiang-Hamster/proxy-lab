@@ -4,10 +4,9 @@
 #include <string.h>
 
 void TEST_is_method() {
-  #undef SCOPE
   #define SCOPE "is_method"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(is_method("GET") == true);
   assert(is_method("get") == false);
@@ -15,13 +14,12 @@ void TEST_is_method() {
   assert(is_method(NULL) == false);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_is_relative_url() {
-  #undef SCOPE
   #define SCOPE "is_relative_url"
-
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(is_relative_url("123") == false);
   assert(is_relative_url("/index.html") == true);
@@ -41,13 +39,13 @@ void TEST_is_relative_url() {
   assert(is_relative_url(NULL) == false);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_is_absolute_url() {
-  #undef SCOPE
   #define SCOPE "is_absolute_url"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(is_absolute_url("foobar") == false);
   assert(is_absolute_url("foo.bar/index.html#") == true);
@@ -66,13 +64,13 @@ void TEST_is_absolute_url() {
   assert(is_absolute_url(NULL) == false);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_is_version() {
-  #undef SCOPE
   #define SCOPE "is_version"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(is_version("HTTP/1.0") == true);
   assert(is_version("HTTP/1") == false);
@@ -82,13 +80,13 @@ void TEST_is_version() {
   assert(is_version(NULL) == false);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_is_triple() {
-  #undef SCOPE
   #define SCOPE "is_triple"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(is_triple("GET foo.bar HTTP/1.0") == true);
   assert(is_triple("GET foo.bar") == false);
@@ -97,65 +95,64 @@ void TEST_is_triple() {
   assert(is_triple(NULL) == false);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_get_maybe_method() {
-  #undef SCOPE
   #define SCOPE "get_maybe_method"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(get_maybe_method("GET foo.bar HTTP/1.0"), "GET") == 0);
   assert(strcmp(get_maybe_method("POST example.com HTTP/1.1"), "POST") == 0);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_get_maybe_url() {
-  #undef SCOPE
   #define SCOPE "get_maybe_url"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(get_maybe_url("GET foo.bar HTTP/1.0"), "foo.bar") == 0);
   assert(strcmp(get_maybe_url("POST example.com HTTP/1.1"), "example.com") == 0);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_get_maybe_version() {
-  #undef SCOPE
   #define SCOPE "get_maybe_version"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(get_maybe_version("GET foo.bar HTTP/1.0"), "HTTP/1.0") == 0);
   assert(strcmp(get_maybe_version("POST example.com HTTP/1.1"), "HTTP/1.1") == 0);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_is_request_line() {
-  #undef SCOPE
   #define SCOPE "is_request_line"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(is_request_line("GET foo.bar HTTP/1.0") == true);
   assert(is_request_line("POST example.com HTTP/1.1") == false);
   assert(is_request_line("GET http://www.cmu.edu/hub/index.html HTTP/1.1") == true);
   assert(is_request_line("GET foo.bar") == false);
   assert(is_request_line("") == false);
-  assert(is_request_line(NULL) == false);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_substr() {
-  #undef SCOPE
   #define SCOPE "substr"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(substr("bar", 1, 2), "a") == 0);
   assert(strcmp(substr("bar", 0, 3), "bar") == 0);
@@ -166,26 +163,26 @@ void TEST_substr() {
   assert(substr(NULL, 0, 0) == NULL);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_Pcre_capture() {
-  #undef SCOPE
   #define SCOPE "Pcre_capture"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(Pcre_capture("\\d", "foo1bar"), "1") == 0);
   assert(strcmp(Pcre_capture("\\S+", " foo "), "foo") == 0);
   assert(strcmp(Pcre_capture("/\\w+", "http://foo.bar"), "/foo") == 0);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_absolute_to_relative() {
-  #undef SCOPE
   #define SCOPE "absolute_to_relative"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(absolute_to_relative("https://foo.bar"), "/") == 0);
   assert(strcmp(absolute_to_relative("http://foo.bar/foo"), "/foo") == 0);
@@ -195,24 +192,24 @@ void TEST_absolute_to_relative() {
   assert(strcmp(absolute_to_relative("foo.bar/index.html#"), "/index.html#") == 0);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_MACROS() {
-  #undef SCOPE
   #define SCOPE "MACROS"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(LINE_SIZE == 115);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_make_request_line() {
-  #undef SCOPE
   #define SCOPE "make_request_line"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(make_request_line("/"), "GET / HTTP/1.0") == 0);
   assert(strcmp(make_request_line("/foo"), "GET /foo HTTP/1.0") == 0);
@@ -220,13 +217,13 @@ void TEST_make_request_line() {
   assert(strcmp(make_request_line("/foo?foo=bar&baz=nox"), "GET /foo?foo=bar&baz=nox HTTP/1.0") == 0);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_get_hostname() {
-  #undef SCOPE
   #define SCOPE "get_hostname"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(get_hostname("https://foo.bar"), "foo.bar") == 0);
   assert(strcmp(get_hostname("http://foo.bar/foo"), "foo.bar") == 0);
@@ -236,26 +233,26 @@ void TEST_get_hostname() {
   assert(strcmp(get_hostname("foo.bar"), "foo.bar") == 0);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_map_request_line() {
-  #undef SCOPE
   #define SCOPE "map_request_line"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(map_request_line("GET http://www.cmu.edu/hub/index.html HTTP/1.1"), "GET /hub/index.html HTTP/1.0") == 0);
   assert(strcmp(map_request_line("GET https://baidu.com HTTP/1.1"), "GET / HTTP/1.0") == 0);
   assert(strcmp(map_request_line("GET http://www.cmu.edu/hub/index.html HTTP/1.1"), "GET /hub/index.html HTTP/1.0") == 0);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 void TEST_concat() {
-  #undef SCOPE
   #define SCOPE "concat"
 
-  puts("\nTesting: " SCOPE);
+  puts("Testing: " SCOPE);
 
   assert(strcmp(concat("foo", "bar"), "foobar") == 0);
   assert(strcmp(concat("foo", ""), "foo") == 0);
@@ -264,6 +261,101 @@ void TEST_concat() {
   assert(concat(NULL, NULL) == NULL);
 
   puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_is_line() {
+  #define SCOPE "is_line"
+
+  puts("Testing: " SCOPE);
+
+  assert(is_line("GET /hub/index.html HTTP/1.0") == true);
+  assert(is_line("foo\nbar") == true);
+  assert(is_line("") == true);
+  assert(is_line("foo\r\nbar") == false);
+  assert(is_line(NULL) == false);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_is_header() {
+  #define SCOPE "is_header"
+
+  puts("Testing: " SCOPE);
+
+  assert(is_header("foobar") == false);
+  assert(is_header("foo: bar") == false);
+  assert(is_header("Host: localhost:4500") == true);
+  assert(is_header("User-Agent: curl/7.81.0") == true);
+  assert(is_header("Accept: */*") == true);
+  assert(is_header("Accept-Encoding: gzip") == true);
+  assert(is_header("") == false);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_get_header_key() {
+  #define SCOPE "get_header_key"
+  puts("Testing: " SCOPE);
+
+  assert(strcmp(get_header_key("Host: localhost:4500"), "Host") == 0);
+  assert(strcmp(get_header_key("User-Agent: curl/7.81.0"), "User-Agent") == 0);
+  assert(strcmp(get_header_key("Accept: */*"), "Accept") == 0);
+  assert(strcmp(get_header_key("Accept-Encoding: gzip"), "Accept-Encoding") == 0);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_get_header_value() {
+  #define SCOPE "get_header_value"
+  puts("Testing: " SCOPE);
+
+  assert(strcmp(get_header_value("Host: localhost:4500"), "localhost:4500") == 0);
+  assert(strcmp(get_header_value("User-Agent: curl/7.81.0"), "curl/7.81.0") == 0);
+  assert(strcmp(get_header_value("Accept: */*"), "*/*") == 0);
+  assert(strcmp(get_header_value("Accept-Encoding: gzip"), "gzip") == 0);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_make_header() {
+  #define SCOPE "make_header"
+  puts("Testing: " SCOPE);
+
+  assert(strcmp(make_header("Host", "localhost:4500"), "Host: localhost:4500") == 0);
+  assert(strcmp(make_header("User-Agent", "curl/7.81.0"), "User-Agent: curl/7.81.0") == 0);
+  assert(strcmp(make_header("Accept", "*/*"), "Accept: */*") == 0);
+  assert(strcmp(make_header("Accept-Encoding", "gzip"), "Accept-Encoding: gzip") == 0);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_can_proxy_modify_key() {
+  #define SCOPE "can_proxy_modify_key"
+  puts("Testing: " SCOPE);
+
+  assert(can_proxy_modify_key("Host") == true);
+  assert(can_proxy_modify_key("User-Agent") == true);
+  assert(can_proxy_modify_key("Accept") == false);
+  assert(can_proxy_modify_key("Accept-Encoding") == false);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_map_header() {
+  #define SCOPE "map_header"
+  puts("Testing: " SCOPE);
+
+  assert(false);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
 }
 
 int main() {
@@ -284,6 +376,13 @@ int main() {
   TEST_make_request_line();
   TEST_get_hostname();
   TEST_map_request_line();
+  TEST_is_line();
+  TEST_is_header();
+  TEST_get_header_key();
+  TEST_get_header_value();
+  TEST_make_header();
+  TEST_can_proxy_modify_key();
+  TEST_map_header();
 
   return 0;
 }
