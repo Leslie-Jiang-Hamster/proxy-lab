@@ -6,9 +6,9 @@
 #include "parse.h"
 
 char *substr(const char *original_string, int l, int r) {
-  if (original_string == NULL || l > r || l < 0 || r > strlen(original_string)) {
-    return NULL;
-  }
+  assert(original_string != NULL);
+  assert(0 <= l && l <= r && r <= strlen(original_string));
+
   int new_string_size = r - l + PADDING;
   char *new_string = calloc(new_string_size, sizeof(char));
   strncpy(new_string, original_string + l, r - l);
@@ -22,10 +22,11 @@ pcre *Pcre_compile(const char *pattern) {
   int error_offset;
 
   pcre *compile_result = pcre_compile(pattern, 0, &error, &error_offset, NULL);
-  if (compile_result == NULL) {
-    puts(SCOPE "compile error");
-    puts(error);
-  }
+  // if (compile_result == NULL) {
+  //   puts(SCOPE "compile error");
+  //   puts(error);
+  // }
+  assert(compile_result != NULL);
   return compile_result;
   #undef SCOPE
 }
@@ -42,16 +43,14 @@ bool Pcre_match(const char *pattern, const char *target) {
   }
 
   int exec_result = pcre_exec(compile_result, NULL, target, strlen(target), 0, 0, ovector, OVECTOR_SIZE);
+  pcre_free(compile_result);
   if (exec_result < 0 && exec_result != PCRE_ERROR_NOMATCH) {
     printf(SCOPE "error: target: %s\n", target);
-    pcre_free(compile_result);
     return false;
   }
   if (exec_result == PCRE_ERROR_NOMATCH) {
-    pcre_free(compile_result);
     return false;
   }
-  pcre_free(compile_result);
   return true;
   #undef SCOPE
 }
@@ -69,9 +68,7 @@ char *Pcre_capture(const char *pattern, const char *target) {
   pcre_free(compile_result);
 
   char *captured_string = substr(target, ovector[0], ovector[1]);
-  if (captured_string == NULL) {
-    puts(SCOPE "substr extraction error");
-  }
+
   return captured_string;
   #undef SCOPE
 }
@@ -147,18 +144,21 @@ bool is_request_line(const char *line) {
 
   char *maybe_method = get_maybe_method(line);
   if (!is_method(maybe_method)) {
+    free(maybe_method);
     return false;
   }
   free(maybe_method);
 
   char *maybe_url = get_maybe_url(line);
   if (!is_absolute_url(maybe_url)) {
+    free(maybe_url);
     return false;
   }
   free(maybe_url);
 
   char *maybe_version = get_maybe_version(line);
   if (!is_version(maybe_version)) {
+    free(maybe_version);
     return false;
   }
   free(maybe_version);
