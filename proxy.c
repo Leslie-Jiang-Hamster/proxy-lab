@@ -35,7 +35,7 @@ static void handle(int connfd) {
     char *port = calloc(RN_LINE_SIZE, sizeof(char));
     sprintf(port, "%d", get_port(absolute_url));
     free(absolute_url);
-
+    
     char *mapped_request_line = map_request_line(request_line);
     free(request_line);
     char *mapped_rn_request_line = line_to_rn_line(mapped_request_line);

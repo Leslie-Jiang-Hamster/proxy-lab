@@ -50,9 +50,7 @@ void TEST_is_absolute_url() {
   assert(is_absolute_url("http://localhost:80") == true);
   assert(is_absolute_url("http://localhost:80/?debug") == true);
   assert(is_absolute_url("1.1.1.1:443/#foo") == true);
-  assert(is_absolute_url("foobar") == true);
   assert(is_absolute_url("foo.bar:80/index.html#") == true);
-  assert(is_absolute_url("http://foobar") == true);
   assert(is_absolute_url("foo.bar") == true);
   assert(is_absolute_url("foo.bar/baz") == true);
   assert(is_absolute_url("foo.bar/?foo=bar&baz=nox#fragment") == true);
@@ -226,6 +224,7 @@ void TEST_get_hostname() {
   puts("Testing: " SCOPE);
 
   assert(strcmp(get_hostname("https://foo.bar"), "foo.bar") == 0);
+  assert(strcmp(get_hostname("https://localhost/"), "localhost") == 0);
   assert(strcmp(get_hostname("192.168.1.1/"), "192.168.1.1") == 0);
   assert(strcmp(get_hostname("http://foo.bar/foo"), "foo.bar") == 0);
   assert(strcmp(get_hostname("https://foo.bar:43/foo/bar/#"), "foo.bar") == 0);

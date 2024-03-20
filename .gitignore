@@ -1,4 +1,6 @@
 /tiny
+/.proxy
+/.noproxy
 
 *.o
 
