@@ -21,6 +21,7 @@ void TEST_is_relative_url() {
   #define SCOPE "is_relative_url"
   puts("Testing: " SCOPE);
 
+  assert(is_relative_url("/nop-file.txt") == true);
   assert(is_relative_url("123") == false);
   assert(is_relative_url("/page?debug") == true);
   assert(is_relative_url("/index.html") == true);
@@ -47,6 +48,7 @@ void TEST_is_absolute_url() {
 
   puts("Testing: " SCOPE);
 
+  assert(is_absolute_url("localhost/nop-file.txt") == true);
   assert(is_absolute_url("http://localhost:80") == true);
   assert(is_absolute_url("http://localhost:80/?debug") == true);
   assert(is_absolute_url("1.1.1.1:443/#foo") == true);
@@ -138,6 +140,7 @@ void TEST_is_request_line() {
   puts("Testing: " SCOPE);
 
   assert(is_request_line("GET foo.bar HTTP/1.0") == true);
+  assert(is_request_line("GET http://localhost:20055/nop-file.txt HTTP/1.1") == true);
   assert(is_request_line("POST example.com HTTP/1.1") == false);
   assert(is_request_line("GET http://www.cmu.edu/hub/index.html HTTP/1.1") == true);
   assert(is_request_line("GET foo.bar") == false);
@@ -179,6 +182,7 @@ void TEST_absolute_to_relative() {
 
   puts("Testing: " SCOPE);
 
+  assert(strcmp(absolute_to_relative("localhost/nop-file.txt"), "/nop-file.txt") == 0);
   assert(strcmp(absolute_to_relative("localhost"), "/") == 0);
   assert(strcmp(absolute_to_relative("localhost:80?foo"), "/?foo") == 0);
   assert(strcmp(absolute_to_relative("192.168.0.1#"), "/#") == 0);

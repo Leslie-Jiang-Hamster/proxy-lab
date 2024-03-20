@@ -16,8 +16,8 @@
 
 // regex patterns
 #define ABSOLUTE "(https?://)?" HOSTNAME "(:\\d+)?"
-#define RELATIVE "(/\\w+)*/?((?<=/)([\\w\\.]+))?(\\?(\\w+(=\\w+)?\\&)*(\\w+(=\\w+)?))?(#\\w*)?"
-#define RELATIVE_STRICT "(/\\w+)*/((?<=/)([\\w\\.]+))?(\\?(\\w+(=\\w+)?\\&)*(\\w+(=\\w+)?))?(#\\w*)?"
+#define RELATIVE "(/\\w+)*/?((?<=/)([\\w\\.-]+))?(\\?(\\w+(=\\w+)?\\&)*(\\w+(=\\w+)?))?(#\\w*)?"
+#define RELATIVE_STRICT "(/\\w+)*/((?<=/)([\\w\\.-]+))?(\\?(\\w+(=\\w+)?\\&)*(\\w+(=\\w+)?))?(#\\w*)?"
 #define HOSTNAME "(\\w+(\\.\\w+)+|localhost)"
 #define TRIPLE "\\S{1," METHOD_SIZE_S "} \\S{1," URL_SIZE_S "} \\S{1," VERSION_SIZE_S "}"
 #define VERSION "HTTP/\\d+\\.\\d+"

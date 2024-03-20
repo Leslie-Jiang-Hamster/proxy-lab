@@ -10,17 +10,19 @@ LDFLAGS = -lpthread -lpcre
 
 all: proxy
 
-csapp.o: csapp.c csapp.h
+csapp.o: csapp.h
 	$(CC) $(CFLAGS) -c csapp.c
 
-proxy.o: csapp.h proxy.h parse.h pool.h csapp.c parse.c pool.c proxy.c
+proxy.o: csapp.h proxy.h pool.h handle.h
 
-proxy: proxy.o csapp.o parse.o pool.o
-	$(CC) $(CFLAGS) proxy.o csapp.o parse.o pool.o -o proxy $(LDFLAGS)
+proxy: proxy.o csapp.o pool.o handle.o parse.o
+	$(CC) $(CFLAGS) proxy.o csapp.o pool.o handle.o parse.o -o proxy $(LDFLAGS)
 
-parse.o: parse.c parse.h
+parse.o: parse.h
 
-pool.o: csapp.h csapp.c pool.c pool.h
+pool.o: csapp.h pool.h
+
+handle.o: handle.h csapp.h parse.h
 
 test: test.o parse.o pool.o csapp.o
 	$(CC) $(CFLAGS) test.o parse.o pool.o csapp.o -o test $(LDFLAGS)
