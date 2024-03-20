@@ -1,4 +1,5 @@
 #include "parse.h"
+#include "pool.h"
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -11,7 +12,6 @@ void TEST_is_method() {
   assert(is_method("GET") == true);
   assert(is_method("get") == false);
   assert(is_method("") == false);
-  assert(is_method(NULL) == false);
 
   puts("All passed: " SCOPE);
   #undef SCOPE
@@ -22,6 +22,7 @@ void TEST_is_relative_url() {
   puts("Testing: " SCOPE);
 
   assert(is_relative_url("123") == false);
+  assert(is_relative_url("/page?debug") == true);
   assert(is_relative_url("/index.html") == true);
   assert(is_relative_url("/") == true);
   assert(is_relative_url("(/)") == false);
@@ -36,7 +37,6 @@ void TEST_is_relative_url() {
   assert(is_relative_url("/foo/bar?baz=123#nox=456") == false);
   assert(is_relative_url("/foo/bar?baz=123http://foo.bar") == false);
   assert(is_relative_url("") == false);
-  assert(is_relative_url(NULL) == false);
 
   puts("All passed: " SCOPE);
   #undef SCOPE
@@ -48,6 +48,8 @@ void TEST_is_absolute_url() {
   puts("Testing: " SCOPE);
 
   assert(is_absolute_url("http://localhost:80") == true);
+  assert(is_absolute_url("http://localhost:80/?debug") == true);
+  assert(is_absolute_url("1.1.1.1:443/#foo") == true);
   assert(is_absolute_url("foobar") == true);
   assert(is_absolute_url("foo.bar:80/index.html#") == true);
   assert(is_absolute_url("http://foobar") == true);
@@ -62,7 +64,6 @@ void TEST_is_absolute_url() {
   assert(is_absolute_url("http://foo.bar/?foo=bar&baz=nox") == true);
   assert(is_absolute_url("http://../..") == false);
   assert(is_absolute_url("") == false);
-  assert(is_absolute_url(NULL) == false);
 
   puts("All passed: " SCOPE);
   #undef SCOPE
@@ -78,7 +79,6 @@ void TEST_is_version() {
   assert(is_version("HTTP/1.0.0") == false);
   assert(is_version("HTTP/foo.bar") == false);
   assert(is_version("") == false);
-  assert(is_version(NULL) == false);
 
   puts("All passed: " SCOPE);
   #undef SCOPE
@@ -93,7 +93,6 @@ void TEST_is_triple() {
   assert(is_triple("GET foo.bar") == false);
   assert(is_triple("FOOBAR foo.bar HTTP/1.1") == false);
   assert(is_triple("") == false);
-  assert(is_triple(NULL) == false);
 
   puts("All passed: " SCOPE);
   #undef SCOPE
@@ -183,6 +182,8 @@ void TEST_absolute_to_relative() {
   puts("Testing: " SCOPE);
 
   assert(strcmp(absolute_to_relative("localhost"), "/") == 0);
+  assert(strcmp(absolute_to_relative("localhost:80?foo"), "/?foo") == 0);
+  assert(strcmp(absolute_to_relative("192.168.0.1#"), "/#") == 0);
   assert(strcmp(absolute_to_relative("https://foo.bar"), "/") == 0);
   assert(strcmp(absolute_to_relative("http://foo.bar/foo"), "/foo") == 0);
   assert(strcmp(absolute_to_relative("https://foo.bar:43/foo/bar/#"), "/foo/bar/#") == 0);
@@ -225,6 +226,7 @@ void TEST_get_hostname() {
   puts("Testing: " SCOPE);
 
   assert(strcmp(get_hostname("https://foo.bar"), "foo.bar") == 0);
+  assert(strcmp(get_hostname("192.168.1.1/"), "192.168.1.1") == 0);
   assert(strcmp(get_hostname("http://foo.bar/foo"), "foo.bar") == 0);
   assert(strcmp(get_hostname("https://foo.bar:43/foo/bar/#"), "foo.bar") == 0);
   assert(strcmp(get_hostname("http://foo.bar:8080?foo=bar"), "foo.bar") == 0);
@@ -257,7 +259,6 @@ void TEST_concat() {
   assert(strcmp(concat("foo", ""), "foo") == 0);
   assert(strcmp(concat("", "bar"), "bar") == 0);
   assert(strcmp(concat("", ""), "") == 0);
-  assert(concat(NULL, NULL) == NULL);
 
   puts("All passed: " SCOPE);
   #undef SCOPE
@@ -272,7 +273,6 @@ void TEST_is_line() {
   assert(is_line("foo\nbar") == true);
   assert(is_line("") == true);
   assert(is_line("foo\r\nbar") == false);
-  assert(is_line(NULL) == false);
 
   puts("All passed: " SCOPE);
   #undef SCOPE
@@ -371,7 +371,45 @@ void TEST_get_port() {
   #undef SCOPE
 }
 
-int main() {
+void TEST_is_rn_line() {
+  #define SCOPE "is_rn_line"
+  puts("Testing: " SCOPE);
+
+  assert(is_rn_line("foo\nbar") == false);
+  assert(is_rn_line("foo") == false);
+  assert(is_rn_line("foo\r\nbar") == false);
+  assert(is_rn_line("\r\n") == true);
+  assert(is_rn_line("foo\n") == false);
+  assert(is_rn_line("foo\r") == false);
+  assert(is_rn_line("foobar\r\n") == true);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_rn_line_to_line() {
+  #define SCOPE "rn_line_to_line"
+  puts("Testing: " SCOPE);
+
+  assert(strcmp(rn_line_to_line("foobar\r\n"), "foobar") == 0);
+  assert(strcmp(rn_line_to_line("\r\n"), "") == 0);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+}
+
+void TEST_line_to_rn_line() {
+  #define SCOPE "line_to_rn_line"
+  puts("Testing: " SCOPE);
+
+  assert(strcmp(line_to_rn_line("foobar"), "foobar\r\n") == 0);
+  assert(strcmp(line_to_rn_line(""), "\r\n") == 0);
+
+  puts("All passed: " SCOPE);
+  #undef SCOPE
+} 
+
+void TEST_MUDULE_parse() {
   TEST_MACROS();
   TEST_is_method();
   TEST_concat();
@@ -397,6 +435,25 @@ int main() {
   TEST_can_proxy_modify_key();
   TEST_map_header();
   TEST_get_port();
+  TEST_is_rn_line();
+  TEST_rn_line_to_line();
+  TEST_line_to_rn_line();
+}
 
+void TEST_MODULE_pool() {
+  puts("Testing module pool");
+  Pool_init();
+  Pool_push(1);
+  Pool_push(2);
+  assert(Pool_pop() == 2);
+  Pool_push(3);
+  assert(Pool_pop() == 3);
+  assert(Pool_pop() == 1);
+  puts("All passed");
+}
+
+int main() {
+  TEST_MUDULE_parse();
+  TEST_MODULE_pool();
   return 0;
 }

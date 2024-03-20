@@ -74,9 +74,7 @@ char *Pcre_capture(const char *pattern, const char *target) {
 }
 
 bool is_method(const char *method) {
-  if (method == NULL) {
-    return false;
-  }
+  assert(method != NULL);
   if (strcmp(method, "GET") == 0) {
     return true;
   }
@@ -84,30 +82,22 @@ bool is_method(const char *method) {
 }
 
 bool is_relative_url(const char *maybe_url) {
-  if (maybe_url == NULL) {
-    return false;
-  }
+  assert(maybe_url != NULL);
   return Pcre_match("^" RELATIVE_STRICT "$", maybe_url);
 }
 
 bool is_absolute_url(const char *maybe_url) {
-  if (maybe_url == NULL) {
-    return false;
-  }
+  assert(maybe_url != NULL);
   return Pcre_match("^" ABSOLUTE "(" RELATIVE ")?$", maybe_url);
 }
 
 bool is_version(const char *maybe_version) {
-  if (maybe_version == NULL) {
-    return false;
-  }
+  assert(maybe_version != NULL);
   return Pcre_match("^" VERSION "$", maybe_version);
 }
 
 bool is_triple(const char *maybe_triple) {
-  if (maybe_triple == NULL) {
-    return false;
-  }
+  assert(maybe_triple != NULL);
   return Pcre_match("^" TRIPLE "$", maybe_triple);
 }
 
@@ -224,9 +214,7 @@ char *get_hostname(const char *absolute_url) {
 }
 
 char *concat(const char *string_1, const char *string_2) {
-  if (string_1 == NULL || string_2 == NULL) {
-    return NULL;
-  }
+  assert(string_1 != NULL && string_2 != NULL);
 
   const int new_string_size = strlen(string_1) + strlen(string_2) + PADDING;
   char *new_string = calloc(new_string_size, sizeof(char));
@@ -235,9 +223,7 @@ char *concat(const char *string_1, const char *string_2) {
 }
 
 bool is_line(const char *string) {
-  if (string == NULL) {
-    return false;
-  }
+  assert(string != NULL);
   return !Pcre_match("\r\n", string);
 }
 
@@ -320,5 +306,31 @@ int get_port(const char *absolute_url) {
   char *port_string = Pcre_capture("(?<=:)\\d+", absolute_url);
   int port = atoi(port_string);
   free(port_string);
+  // in case atoi cannot parse the port, or the port number is not within range
+  assert(0 < port && port < (2 << 16));
   return port;
+}
+
+bool is_rn_line(char *maybe_rn_line) {
+  assert(maybe_rn_line != NULL);
+  assert(strlen(maybe_rn_line) >= 2);
+
+  if (Pcre_match("\r\n$", maybe_rn_line)) {
+    return true;
+  }
+  return false;
+}
+
+char *rn_line_to_line(char *rn_line) {
+  assert(is_rn_line(rn_line));
+
+  return Pcre_capture(".*(?=\r\n$)", rn_line);
+}
+
+char *line_to_rn_line(char *line) {
+  assert(is_line(line));
+
+  char *rn_line = calloc(LINE_SIZE + PADDING, sizeof(char));
+  sprintf(rn_line, "%s\r\n", line);
+  return rn_line;
 }

@@ -16,8 +16,8 @@
 
 // regex patterns
 #define ABSOLUTE "(https?://)?\\w+(\\.\\w+)*(:\\d+)?"
-#define RELATIVE "(/\\w+)*/?((?<=/)([\\w\\.]+))?(\\?(\\w+=\\w+\\&)*(\\w+=\\w+))?(#\\w*)?"
-#define RELATIVE_STRICT "(/\\w+)*/((?<=/)([\\w\\.]+))?(\\?(\\w+=\\w+\\&)*(\\w+=\\w+))?(#\\w*)?"
+#define RELATIVE "(/\\w+)*/?((?<=/)([\\w\\.]+))?(\\?(\\w+(=\\w+)?\\&)*(\\w+(=\\w+)?))?(#\\w*)?"
+#define RELATIVE_STRICT "(/\\w+)*/((?<=/)([\\w\\.]+))?(\\?(\\w+(=\\w+)?\\&)*(\\w+(=\\w+)?))?(#\\w*)?"
 #define HOSTNAME "\\w+(\\.\\w+)+"
 #define TRIPLE "\\S{1," METHOD_SIZE_S "} \\S{1," URL_SIZE_S "} \\S{1," VERSION_SIZE_S "}"
 #define VERSION "HTTP/\\d+\\.\\d+"
@@ -47,3 +47,6 @@ char *make_header(const char *key, const char *value);
 bool can_proxy_modify_key(const char *key);
 char *map_header(const char *header);
 int get_port(const char *absolute_url);
+bool is_rn_line(char *maybe_rn_line);
+char *rn_line_to_line(char *rn_line);
+char *line_to_rn_line(char *line);

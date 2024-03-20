@@ -13,16 +13,17 @@ all: proxy
 csapp.o: csapp.c csapp.h
 	$(CC) $(CFLAGS) -c csapp.c
 
-proxy.o: proxy.c csapp.h
-	$(CC) $(CFLAGS) -c proxy.c
+proxy.o: csapp.h proxy.h parse.h pool.h csapp.c parse.c pool.c proxy.c
 
-proxy: proxy.o csapp.o
-	$(CC) $(CFLAGS) proxy.o csapp.o -o proxy $(LDFLAGS)
+proxy: proxy.o csapp.o parse.o pool.o
+	$(CC) $(CFLAGS) proxy.o csapp.o parse.o pool.o -o proxy $(LDFLAGS)
 
 parse.o: parse.c parse.h
 
-test: test.o parse.o
-	$(CC) $(CFLAGS) test.o parse.o -o test $(LDFLAGS)
+pool.o: csapp.h csapp.c pool.c pool.h
+
+test: test.o parse.o pool.o csapp.o
+	$(CC) $(CFLAGS) test.o parse.o pool.o csapp.o -o test $(LDFLAGS)
 
 # Creates a tarball in ../proxylab-handin.tar that you can then
 # hand in. DO NOT MODIFY THIS!
@@ -31,4 +32,3 @@ handin:
 
 clean:
 	rm -f *~ *.o proxy core *.tar *.zip *.gzip *.bzip *.gz
-
