@@ -1,6 +1,7 @@
 #include "handle.h"
 #include "csapp.h"
 #include "parse.h"
+#include "cache.h"
 #include <assert.h>
 
 static const int RN_LINE_SIZE = 1024;
@@ -19,10 +20,22 @@ void handle(int connfd) {
   assert(is_request_line(request_line));
 
   char *absolute_url = get_maybe_url(request_line);
+
+  if (Cache_has(absolute_url)) {
+    printf("Cache hit: %s\n", absolute_url);
+    free(request_line);
+    char *response = Cache_read(absolute_url);
+    free(absolute_url);
+    int response_size = strlen(response);
+    Rio_writen(connfd, response, response_size);
+    free(response);
+    Close(connfd);
+    return;
+  }
+
   char *hostname = get_hostname(absolute_url);
   char *port = calloc(RN_LINE_SIZE, sizeof(char));
   sprintf(port, "%d", get_port(absolute_url));
-  free(absolute_url);
   
   char *mapped_request_line = map_request_line(request_line);
   free(request_line);
@@ -32,11 +45,7 @@ void handle(int connfd) {
   int serverfd = Open_clientfd(hostname, port);
   free(hostname);
   free(port);
-  // if (serverfd < 0) {
-  //     free(mapped_rn_request_line);
-  //     Close(connfd);
-  //     return;
-  // }
+
   Rio_writen(serverfd, mapped_rn_request_line, strlen(mapped_rn_request_line));
   free(mapped_rn_request_line);
 
@@ -62,6 +71,8 @@ void handle(int connfd) {
   char *response = calloc(RESPONSE_SIZE, sizeof(char));
   int response_size = Rio_readn(serverfd, response, RESPONSE_SIZE);
   Rio_writen(connfd, response, response_size);
+  Cache_write(absolute_url, response);
+  free(absolute_url);
   free(response);
 
   Close(connfd);

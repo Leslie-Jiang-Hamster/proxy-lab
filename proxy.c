@@ -4,6 +4,7 @@
 #include "csapp.h"
 #include "pool.h"
 #include "handle.h"
+#include "cache.h"
 
 static const int THREAD_NUMBER = 12;
 static struct sockaddr_storage addr;
@@ -35,6 +36,7 @@ static void create_threads(int thread_number) {
 
 int main(int argc, char **argv)
 {
+    Cache_init();
     Pool_init();
     create_threads(THREAD_NUMBER);
     int listenfd = Open_listenfd(get_port_from_cmdline(argc, argv));

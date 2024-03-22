@@ -15,14 +15,14 @@ csapp.o: csapp.h
 
 proxy.o: csapp.h proxy.h pool.h handle.h
 
-proxy: proxy.o csapp.o pool.o handle.o parse.o
-	$(CC) $(CFLAGS) proxy.o csapp.o pool.o handle.o parse.o -o proxy $(LDFLAGS)
+proxy: proxy.o csapp.o pool.o handle.o parse.o cache.o
+	$(CC) $(CFLAGS) proxy.o csapp.o pool.o handle.o parse.o cache.o -o proxy $(LDFLAGS)
 
 parse.o: parse.h
 
 pool.o: csapp.h pool.h
 
-handle.o: handle.h csapp.h parse.h
+handle.o: handle.h csapp.h parse.h cache.h
 
 cache.o: cache.h
 

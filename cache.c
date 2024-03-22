@@ -14,12 +14,12 @@
 #ifdef DEBUG
 static const int MAX_CACHE_SIZE = 5;
 #else
-static const int MAX_CACHE_SIZE = 1000000;
+static const int MAX_CACHE_SIZE = 1e6;
 #endif
 
 static const int MODULUS_PRIME = 997;
 static const int SMALL_PRIME = 31;
-static const int MAX_OBJECT_SIZE = 100000;
+static const int MAX_OBJECT_SIZE = 1e5;
 static const int INFINITY = 2e9;
 static int object_number = 0;
 static int cache_size = 0;
@@ -36,7 +36,7 @@ static int hash(const char *key) {
   return hash;
 }
 
-static bool Cache_has(const char *key) {
+bool Cache_has(const char *key) {
   pthread_rwlock_rdlock(lock + hash(key));
   object_t *head = objects + hash(key);
   while (head != NULL && head->key != NULL) {

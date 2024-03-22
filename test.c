@@ -460,9 +460,12 @@ void TEST_MODULE_cache() {
   puts("Testing module cache");
 
   Cache_init();
+  assert(Cache_has("foo") == false);
   Cache_write("foo", "bar");
+  assert(Cache_has("foo") == true);
   assert(strcmp(Cache_read("foo"), "bar") == 0);
   Cache_write("baz", "nox");
+  assert(Cache_has("baz") == true);
   assert(strcmp(Cache_read("baz"), "nox") == 0);
 
   puts("All passed");
