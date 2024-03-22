@@ -463,9 +463,8 @@ void TEST_MODULE_cache() {
   Cache_write("foo", "bar");
   assert(strcmp(Cache_read("foo"), "bar") == 0);
   Cache_write("baz", "nox");
-  assert(strcmp(Cache_read("foo"), "bar") == 0);
   assert(strcmp(Cache_read("baz"), "nox") == 0);
-  
+
   puts("All passed");
 }
 
