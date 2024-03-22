@@ -1,5 +1,6 @@
 #include "parse.h"
 #include "pool.h"
+#include "cache.h"
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -455,8 +456,22 @@ void TEST_MODULE_pool() {
   puts("All passed");
 }
 
+void TEST_MODULE_cache() {
+  puts("Testing module cache");
+
+  Cache_init();
+  Cache_write("foo", "bar");
+  assert(strcmp(Cache_read("foo"), "bar") == 0);
+  Cache_write("baz", "nox");
+  assert(strcmp(Cache_read("foo"), "bar") == 0);
+  assert(strcmp(Cache_read("baz"), "nox") == 0);
+  
+  puts("All passed");
+}
+
 int main() {
   TEST_MUDULE_parse();
   TEST_MODULE_pool();
+  TEST_MODULE_cache();
   return 0;
 }

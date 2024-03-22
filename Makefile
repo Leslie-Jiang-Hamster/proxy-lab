@@ -24,8 +24,10 @@ pool.o: csapp.h pool.h
 
 handle.o: handle.h csapp.h parse.h
 
-test: test.o parse.o pool.o csapp.o
-	$(CC) $(CFLAGS) test.o parse.o pool.o csapp.o -o test $(LDFLAGS)
+cache.o: cache.h
+
+test: test.o parse.o pool.o csapp.o cache.o
+	$(CC) $(CFLAGS) test.o parse.o pool.o csapp.o cache.o -o test $(LDFLAGS)
 
 # Creates a tarball in ../proxylab-handin.tar that you can then
 # hand in. DO NOT MODIFY THIS!
